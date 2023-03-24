@@ -1,16 +1,30 @@
 package com.example.demo
 
+import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Toast
-import com.example.locations.LocationProvider
+import android.util.Log
+import com.example.locations.LocationEngine
+import com.example.locations.LocationEngineProvider
+import com.example.locations.LocationListener
 
 class MainActivity : AppCompatActivity() {
+
+  private lateinit var locationEngine: LocationEngine
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_main)
-    val locationProvider = LocationProvider()
-    val location = locationProvider.getLocation()
-    Toast.makeText(this, "Thong tin location la: ${location.latitude} va ${location.longitude}", Toast.LENGTH_SHORT).show()
+    locationEngine = LocationEngineProvider.getBestLocationEngine(this)
+    locationEngine.setLocationChangedListener(object : LocationListener {
+      override fun onLocationChanged(location: Location?) {
+        Log.e("duydung", "Location change: Lat ${location?.latitude} va Long ${location?.longitude}")
+      }
+    })
+    locationEngine.startLocationUpdate()
+  }
+
+  override fun onStop() {
+    locationEngine.stopLocationUpdate()
+    super.onStop()
   }
 }
