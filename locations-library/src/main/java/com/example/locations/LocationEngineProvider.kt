@@ -9,7 +9,6 @@ object LocationEngineProvider {
   private const val GOOGLE_LOCATION_SERVICES = "com.google.android.gms.location.LocationServices"
   private const val GOOGLE_API_AVAILABILITY = "com.google.android.gms.common.GoogleApiAvailability"
 
-  @JvmStatic
   fun getBestLocationEngine(context: Context): LocationEngine {
     var hasGoogleLocationServices = isOnClasspath(GOOGLE_LOCATION_SERVICES)
     if (isOnClasspath(GOOGLE_API_AVAILABILITY)) {
