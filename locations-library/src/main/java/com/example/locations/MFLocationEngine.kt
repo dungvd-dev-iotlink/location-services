@@ -4,17 +4,17 @@ import android.content.Context
 import android.location.Location
 import java.lang.ref.WeakReference
 
-abstract class LocationEngine {
+abstract class MFLocationEngine {
 
   protected var lastKnownLocation: Location? = null
   protected var contextWeakReference: WeakReference<Context>? = null
-  protected var onLocationChangedListener: LocationListener? = null
+  protected var onLocationChangedListener: MFLocationListener? = null
 
   protected constructor(context: Context) {
     contextWeakReference = WeakReference(context)
   }
 
-  fun setLocationChangedListener(locationListener: LocationListener?) {
+  fun setLocationChangedListener(locationListener: MFLocationListener?) {
     onLocationChangedListener = locationListener
   }
   abstract fun startLocationUpdate()

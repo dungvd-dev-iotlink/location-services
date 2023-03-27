@@ -10,7 +10,7 @@ import android.util.Log
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.*
 
-class FusedLocationProvider: LocationEngine {
+class MFFusedLocationProvider: MFLocationEngine {
 
   companion object {
     private const val LOCATION_REQUEST_FASTEST_INTERVAL: Long = 500

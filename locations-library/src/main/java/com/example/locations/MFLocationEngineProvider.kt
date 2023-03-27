@@ -4,18 +4,18 @@ import android.content.Context
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 
-object LocationEngineProvider {
+object MFLocationEngineProvider {
 
   private const val GOOGLE_LOCATION_SERVICES = "com.google.android.gms.location.LocationServices"
   private const val GOOGLE_API_AVAILABILITY = "com.google.android.gms.common.GoogleApiAvailability"
 
-  fun getBestLocationEngine(context: Context): LocationEngine {
+  fun getBestLocationEngine(context: Context): MFLocationEngine {
     var hasGoogleLocationServices = isOnClasspath(GOOGLE_LOCATION_SERVICES)
     if (isOnClasspath(GOOGLE_API_AVAILABILITY)) {
       hasGoogleLocationServices = hasGoogleLocationServices and (GoogleApiAvailability.getInstance()
         .isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS)
     }
-    return if (hasGoogleLocationServices) FusedLocationProvider(context) else DeviceLocationProvider(context)
+    return if (hasGoogleLocationServices) MFFusedLocationProvider(context) else MFDeviceLocationProvider(context)
   }
 
   private fun isOnClasspath(className: String): Boolean {
