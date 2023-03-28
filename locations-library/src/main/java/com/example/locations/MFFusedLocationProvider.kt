@@ -9,6 +9,7 @@ import android.os.Looper
 import android.util.Log
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.*
+import java.lang.reflect.Method
 
 class MFFusedLocationProvider: MFLocationEngine {
 
@@ -18,9 +19,12 @@ class MFFusedLocationProvider: MFLocationEngine {
     private const val TIME_REQUEST_UPDATE_LOCATION: Long = 1000L
   }
 
-  private var fusedLocationProviderClient: FusedLocationProviderClient? = null
+  private var fusedLocationProviderClient: Object? = null
   private lateinit var locationRequest: LocationRequest
   private lateinit var locationCallback: LocationCallback
+
+  private var requestLocationUpdatesCallback: Method? = null
+  private var removeLocationUpdatesCallback: Method? = null
 
   constructor(context: Context) : super(context) {
     Log.e("duydung", "init FusedLocationProvider")
@@ -30,7 +34,12 @@ class MFFusedLocationProvider: MFLocationEngine {
   }
 
   private fun initFusedLocationComponents(context: Context) {
-    fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
+    val classFusedLocationProviderClient = Class.forName("com.google.android.gms.location.FusedLocationProviderClient")
+    fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context) as Object
+
+    requestLocationUpdatesCallback = classFusedLocationProviderClient.getMethod("requestLocationUpdates", LocationRequest::class.java, LocationCallback::class.java, Looper::class.java)
+    removeLocationUpdatesCallback = classFusedLocationProviderClient.getMethod("removeLocationUpdates", LocationCallback::class.java)
+
     locationRequest = LocationRequest.create()
       .setInterval(TIME_REQUEST_UPDATE_LOCATION)
       .setFastestInterval(LOCATION_REQUEST_FASTEST_INTERVAL)
@@ -66,11 +75,7 @@ class MFFusedLocationProvider: MFLocationEngine {
     }
 
     try {
-      fusedLocationProviderClient?.requestLocationUpdates(
-        locationRequest,
-        locationCallback,
-        Looper.getMainLooper()
-      )
+      requestLocationUpdatesCallback?.invoke(fusedLocationProviderClient, locationRequest, locationCallback, Looper.getMainLooper())
     } catch (e: Exception) {
       e.printStackTrace()
     }
@@ -79,8 +84,10 @@ class MFFusedLocationProvider: MFLocationEngine {
   override fun stopLocationUpdate() {
     if (fusedLocationProviderClient != null) {
       try {
-        fusedLocationProviderClient?.removeLocationUpdates(locationCallback)
+        removeLocationUpdatesCallback?.invoke(fusedLocationProviderClient, locationCallback)
         fusedLocationProviderClient = null
+        requestLocationUpdatesCallback = null
+        removeLocationUpdatesCallback = null
       } catch (e: java.lang.Exception) {
         e.printStackTrace()
       }
